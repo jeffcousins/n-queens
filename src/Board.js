@@ -82,7 +82,8 @@
       // counts how many pieces are found in the input rowIndex
       var totalInRow = _.reduce(this.get(rowIndex), function(count, val) {
         if (val === 1) {
-          return count += 1;
+          count += 1;
+          return count;
         } else {
           return count;
         }
@@ -94,7 +95,6 @@
 
     // test if any rows on this board contain conflicts
     hasAnyRowConflicts: function() {
-      // find number of rows/cols in board
       var numRows = this.attributes.n;
 
       // loop through each row
@@ -116,36 +116,31 @@
     //
     // test if a specific column on this board contains a conflict
     hasColConflictAt: function(colIndex) {
-      // check if every row does not have a piece at the given colIndex
-      return _.every(this.rows(), function(row) {
-        return row[colIndex] === 0;
-      });
+      // counts how many rows contain a piece in the input colIndex
+      var totalInCol = _.reduce(this.rows(), function(count, row) {
+        if (row[colIndex] === 1) {
+          count += 1;
+          return count;
+        } else {
+          return count;
+        }
+      }, 0);
+
+      // return true if there are more than 1
+      return totalInCol > 1;
     },
 
     // test if any columns on this board contain conflicts
     hasAnyColConflicts: function() {
-      var badCols = {};
-      var result = false;
+      var numCols = this.attributes.n;
 
-      // loop through each row
-      _.each(this.rows(), function(row) {
-        // loop through each col in row
-        _.each(row, function(val, colIndex) {
-          // if current location has a piece
-          if (val === 1) {
-            // if current colIndex wasn't previously found, store it for future checks
-            if (!badCols[colIndex]) {
-              badCols[colIndex] = true;
-            // if colIndex was previously found
-            } else {
-              result = true;;
-            }
-          }
-        });
+      for (var col = 0; col < numCols; col++) {
+        if (this.hasColConflictAt(col)) {
+          return true;
+        }
+      }
 
-      });
-
-      return result;
+      return false;
     },
 
 
